@@ -1,0 +1,67 @@
+html, body{
+    margin: 0px auto;
+    font-family: Arial, sans-serif;
+}
+#wrapper{
+    width: 1200px;
+    margin: 0px auto;
+}
+#content{
+    font-size: 13px;
+    color: #424242;
+}
+#leftContent{
+    width: 320px;
+    height: 800px;
+    text-align: center;
+    border-right: 5px solid #FFFFFF;
+    float: left;
+}
+#rightContent{
+    width: 880px;
+    margin: 0px 320px;
+}
+
+
+
+table{
+    border-collapse: collapse;
+}
+td{
+    padding: 10px;
+}
+tr:nth-child(odd){
+    background: #FFFFFF;
+}
+tr:nth-child(even){
+    background: #F7F2E0;
+}
+
+
+
+select, input, textarea{
+    outline: none;
+}
+option, input{
+    padding: 7px;
+}
+select{
+    border-left: none;
+    border-right: none;
+    overflow-x: auto;
+    overflow-y: auto;
+    font-size: 12px;
+}
+input[type=submit]{
+    background: #424242;
+    color: #FFFFFF;
+    border: none;
+    cursor: pointer;
+}
+#addButton{
+    background: #EBBD5B;
+    color: #424242;
+}
+#deleteButton{
+    background: #FA5858;
+}

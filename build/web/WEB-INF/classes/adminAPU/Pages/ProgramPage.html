@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+            <div id="content">
+                <wicket:extend>
+
+                    <div id="leftContent">
+                        <form wicket:id="subjectsNamesForm">
+                            <p style="font-size: 16px">
+                                <span wicket:id="educationLevelLabel" /><br />
+                                <span wicket:id="courseLabel" /><br />
+                                <span wicket:id="semesterLabel" />
+                            </p>
+                            <p><select wicket:id="subjectsNamesList" style="width: 320px" /></p>
+                            <input type="submit" value="Показать информацию" style="width: 320px" />
+                        </form>
+                        <br/>
+                        <form wicket:id="addSubjectForm">
+                            <input id="addButton" type="submit" value="Добавить предмет" style="width: 320px" />
+                        </form>
+                    </div>
+
+                    <div id="rightContent">
+                        <form wicket:id="selectedSubjectInfoForm">
+                            <table>
+                                <tr>
+                                    <td><label>Название предмета</label></td>
+                                    <td colspan="5"><input wicket:id="subjectName" type="text" style="width: 400px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Название кафедры</label></td>
+                                    <td colspan="5"><input wicket:id="pulpitName" type="text" style="width: 250px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Цикл обучения</label></td>
+                                    <td colspan="2"><span wicket:id="cycles"></span></td>
+                                    <td><label>Формы сдачи</label></td>
+                                    <td colspan="2">
+                                        <a>
+                                            <input type="checkbox" wicket:id="differentiatedCreditCheckbox" />
+                                            <label>Дифференцированный зачет</label>
+                                        </a>
+                                        <br/>
+                                        <a>
+                                            <input type="checkbox" wicket:id="courseProjectCheckbox" />
+                                            <label>Курсовой проект</label>
+                                        </a>
+                                        <br/>
+                                        <a>
+                                            <input type="checkbox" wicket:id="courseWorkCheckbox" />
+                                            <label>Курсовая работа</label>
+                                        </a>
+                                        <br/>
+                                        <a>
+                                            <input type="checkbox" wicket:id="examCheckbox" />
+                                            <label>Экзамен</label>
+                                        </a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><label>Аудиторные часы</label></td>
+                                    <td><input wicket:id="classHours" type="text" style="width: 25px" /></td>
+                                    <td><label>Самостоятельные часы</label></td>
+                                    <td><input wicket:id="selfHours" type="text" style="width: 25px" /></td>
+                                    <td><label>Общая продолжительность</label></td>
+                                    <td><input wicket:id="totalDuration" type="text" style="width: 25px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Лекционные часы в неделю</label></td>
+                                    <td><input wicket:id="lectureHoursPerWeek" type="text" style="width: 25px" /></td>
+                                    <td><label>Практические часы в неделю</label></td>
+                                    <td><input wicket:id="practicalHoursPerWeek" type="text" style="width: 25px" /></td>
+                                    <td><label>Лабораторные часы в неделю</label></td>
+                                    <td><input wicket:id="laboratoryHoursPerWeek" type="text" style="width: 25px" /></td>
+                                </tr>
+                                <tr></tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td><label>Всего часов в неделю</label></td>
+                                    <td><input wicket:id="totalHoursPerWeek" type="text" style="width: 25px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Краткое описание</label></td>
+                                    <td colspan="5"><textarea wicket:id="shortDescription" rows="3" cols="92" style="resize: none" /></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="6" style="text-align: right"><input type="submit" value="Обновить информацию" style="width: 200px" /></td>                                    
+                                </tr>
+                            </table>
+                        </form>
+                        <form wicket:id="deleteSubjectForm">
+                            <table style="height: 100%">
+                                <tr>
+                                    <td style="width: 880px; text-align: right"><input id="deleteButton" type="submit" value="Удалить предмет" style="width: 200px" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+
+                </wicket:extend>
+            </div>
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>

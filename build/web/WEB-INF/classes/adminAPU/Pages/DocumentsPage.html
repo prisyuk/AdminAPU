@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+
+            <div id="content">
+                <wicket:extend>
+                    <form wicket:id="uploadDocument" style="width: 1200px; text-align: center">
+                        <p><span wicket:id="educationLevelLabel" style="font-size: 20px" /></p>
+                        <input wicket:id="fileUploadField" type="file" />
+                        <input id="addButton" type="submit" value="Загрузить документ" />
+                    </form>
+                    <br/>
+                    <form wicket:id="documentsForm" style="width: 1200px; text-align: center">
+                        <select wicket:id="documentsNamesList" style="width: 600px; font-size: 16px" />
+                    </form>
+                    <form wicket:id="deleteDocument" style="width: 1200px; text-align: center">
+                        <input id="deleteButton" type="submit" value="Удалить документ" style="width: 600px" />
+                    </form>
+                </wicket:extend>
+            </div>
+
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"  
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"  
+      xml:lang="en"  
+      lang="en"> 
+    <head>
+        <wicket:head>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="headerPanelStyle.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <wicket:panel>
+            <nav id="menu">
+                <ul>
+                    <li><a>Программа</a>
+                        <ul>
+                            <li><a>Бакалавриат</a>
+                                <ul>
+                                    <li><a>1 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="B11Link">1 семестр</a></li>
+                                            <li><a wicket:id="B12Link">2 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a>2 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="B23Link">3 семестр</a></li>
+                                            <li><a wicket:id="B24Link">4 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a>3 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="B35Link">5 семестр</a></li>
+                                            <li><a wicket:id="B36Link">6 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a>4 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="B47Link">7 семестр</a></li>
+                                            <li><a wicket:id="B48Link">8 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li><a>Магистратура</a>
+                                <ul>
+                                    <li><a>5 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="M11Link">9 семестр</a></li>
+                                            <li><a wicket:id="M12Link">10 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a>6 курс</a>
+                                        <ul>
+                                            <li><a wicket:id="M23Link">11 семестр</a></li>
+                                            <li><a wicket:id="M24Link">12 семестр</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a>Люди</a>
+                        <ul>
+                            <li><a wicket:id="teachersLink">Преподаватели</a></li>
+                            <li><a>Выпускники</a>
+                                <ul>
+                                    <li><a wicket:id="baccalaureateGraduatersLink">Бакалавриат</a></li>
+                                    <li><a wicket:id="magistracyGraduatersLink">Магистратура</a></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </li>
+                    <li><a>Расписание</a>
+                        <ul>
+                            <li>Экзамены</li>
+                            <li>Защита ВКР</li>
+                        </ul>
+                    </li>
+                    <li><a>Документы</a>
+                        <ul>
+                            <li><a wicket:id="baccalaureateDocumentsLink">Бакалавриат</a></li>
+                            <li><a wicket:id="magistracyDocumentsLink">Магистратура</a></li>
+                        </ul>
+                    </li>
+                    <li><a wicket:id="otherLink">Прочее</a></li>
+                </ul>
+            </nav>
+        </wicket:panel>
+    </body>
+</html>

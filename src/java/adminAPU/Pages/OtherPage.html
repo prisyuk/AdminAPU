@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+
+            <div id="content">
+                <wicket:extend>
+                    <form wicket:id="contactsForm">
+                        <table style="width: 100%; height: 100%; table-layout: fixed">
+                            <tr>
+                                <td colspan="2" style="text-align: center"><label>КОНТАКТЫ КАФЕДРЫ</label></td>                                
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Название кафедры</label></td>
+                                <td style="text-align: left"><input wicket:id="pulpitName" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Физический адрес</label></td>
+                                <td style="text-align: left"><input wicket:id="address" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Контактный телефон</label></td>
+                                <td style="text-align: left"><input wicket:id="phone" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Электронная почта</label></td>
+                                <td style="text-align: left"><input wicket:id="email" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Контактное лицо</label></td>
+                                <td style="text-align: left"><input wicket:id="contactPerson" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Обращение к пользователям</label></td>
+                                <td style="text-align: left"><input wicket:id="appeal" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td colspan="2" style="text-align: right"><input type="submit" value="Обновить информацию" /></td>
+                            </tr>
+                        </table>                        
+                    </form>
+
+                    <form wicket:id="statisticsForm">
+                        <table style="width: 100%; height: 100%; table-layout: fixed">
+                            <tr>
+                                <td colspan="2" style="text-align: center"><label>СТАТИСТИКА НАПРАВЛЕНИЯ</label></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Обучающиеся студенты</label></td>
+                                <td style="text-align: left"><input wicket:id="students" type="text" style="width: 50px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Выпускники</label></td>
+                                <td style="text-align: left"><input wicket:id="graduaters" type="text" style="width: 50px" /></td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: right"><label>Закончили с отличием</label></td>
+                                <td style="text-align: left"><input wicket:id="excellentGraduaters" type="text" style="width: 50px" /></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" style="text-align: right"><input type="submit" value="Обновить информацию" /></td>
+                            </tr>
+                        </table>                        
+                    </form>
+                </wicket:extend>
+            </div>
+
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>

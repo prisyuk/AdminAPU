@@ -1,0 +1,22 @@
+#footerPanel{
+    width: 1200px;
+    height: 30px;
+    position: absolute;
+    bottom: 0;    
+    background: #EBBD5B;
+    color: #424242;
+    text-align: center;
+    line-height: 2em;
+    font-size: 15px;
+    font-weight: bold;
+}
+
+#pulpitLink{
+    width: 200px;
+    float: left;
+}
+
+#welcomePageLink{
+    width: 320px;
+    margin: 0px 880px;
+}
