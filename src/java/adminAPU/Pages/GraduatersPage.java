@@ -84,14 +84,22 @@ public class GraduatersPage extends BasePage {
             archiveYears = dataService.getChildrenCards(MAGISTRACY_GRADUATERS_CARD_ID);
         }
 
-        years = (List<String>) archiveYears.keySet();
+        years = new ArrayList<>(archiveYears.values());
+        archiveYears = archiveYears.entrySet().stream().collect(Collectors.toMap(entry -> entry.getValue(), entry -> entry.getKey()));
+
         ListChoice<String> yearsList = new ListChoice<>("yearsList", new PropertyModel<String>(this, "selectedYear"), years);
         yearsList.setMaxRows(5);
-
+        
+        if (selectedYear == null)
+        {
+            selectedYear = years.get(0);
+        }
+        
         archiveGraduaters = dataService.getChildrenCards(archiveYears.get(selectedYear));
         Map<String, String> sortedArchiveGraduaters = new TreeMap<>(archiveGraduaters);
 
-        graduatersNames = (List<String>) sortedArchiveGraduaters.keySet();
+        sortedArchiveGraduaters = sortedArchiveGraduaters.entrySet().stream().collect(Collectors.toMap(entry -> entry.getValue(), entry -> entry.getKey()));
+        graduatersNames = new ArrayList<>(sortedArchiveGraduaters.keySet());
         ListChoice<String> graduatersNamesList = new ListChoice<>("graduatersNamesList", new PropertyModel<String>(this, "selectedGraduaterName"), graduatersNames);
         graduatersNamesList.setMaxRows(15);
 
@@ -106,7 +114,7 @@ public class GraduatersPage extends BasePage {
         final TextField<String> graduationWorkName = new TextField<String>("graduationWorkName", new PropertyModel<String>(this, "graduationWorkNameValue"));
         final TextField<String> teacherName = new TextField<String>("teacherName", new PropertyModel<String>(this, "teacherNameValue"));
         final TextField<String> altTeacherName = new TextField<String>("altTeacherName", new PropertyModel<String>(this, "altTeacherNameValue"));
-        final TextField<String> jobPlaceName = new TextField<String>("jobPlace", new PropertyModel<String>(this, "jobPlaceValue"));
+        final TextField<String> jobPlace = new TextField<String>("jobPlace", new PropertyModel<String>(this, "jobPlaceValue"));
         final TextField<String> position = new TextField<String>("position", new PropertyModel<String>(this, "positionValue"));
         final TextArea<String> shortReference = new TextArea<>("shortReference", new PropertyModel<String>(this, "shortReferenceValue"));
 
@@ -119,7 +127,7 @@ public class GraduatersPage extends BasePage {
             }
         };
 
-        Form<?> graduatersNamesForm = new Form<Void>("graguatersNamesForm") {
+        Form<?> graduatersNamesForm = new Form<Void>("graduatersNamesForm") {
             @Override
             public void onSubmit() {
                 pageParameters.remove("selectedGraduaterName");
@@ -145,7 +153,7 @@ public class GraduatersPage extends BasePage {
         selectedGraduaterInfoForm.add(graduationWorkName);
         selectedGraduaterInfoForm.add(teacherName);
         selectedGraduaterInfoForm.add(altTeacherName);
-        selectedGraduaterInfoForm.add(jobPlaceName);
+        selectedGraduaterInfoForm.add(jobPlace);
         selectedGraduaterInfoForm.add(position);
         selectedGraduaterInfoForm.add(shortReference);
 

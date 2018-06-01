@@ -1,12 +1,16 @@
 package adminAPU.Pages;
 
 import adminAPU.BasePage;
+import adminAPU.Pages.AddPages.AddTeacherPage;
 import com.alee.archive3.Archive3ServerConnector;
+import com.alee.archive3.api.data.ArchiveDocument;
 import com.alee.archive3.api.data.ArchiveObject;
 import com.alee.archive3.api.data.AttributeValue;
 import com.alee.archive3.api.data.CompleteCard;
 import com.alee.archive3.api.exceptions.ArchiveSystemError;
 import com.alee.archive3.api.exceptions.UnknownServiceException;
+import com.alee.archive3.api.filetransfer.ArchiveFileUploader;
+import com.alee.archive3.api.filetransfer.FileUploadListener;
 import com.alee.archive3.api.network.Requisite;
 import com.alee.archive3.api.search.AdvSearchableField;
 import com.alee.archive3.api.search.FieldType;
@@ -15,10 +19,10 @@ import com.alee.archive3.api.search.SearchRequest;
 import com.alee.archive3.api.ws.AttributeService;
 import com.alee.archive3.api.ws.DataService;
 import com.alee.archive3.api.ws.SearchService;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +33,8 @@ import org.apache.wicket.markup.html.form.ListChoice;
 import org.apache.wicket.markup.html.form.RadioChoice;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
+import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
 
@@ -67,6 +73,12 @@ public class TeachersPage extends BasePage {
     private List<String> teachersNames;
     private String selectedTeacherName;
     private String selectedAcademicDegree;
+    private List<String> documentsNames;
+    private String selectedDocumentName;
+
+    private ArchiveObject selectedTeacherArchiveObject;
+
+    private FileUploadField fileUploadField;
 
     public TeachersPage(PageParameters pageParameters) {
 
@@ -81,11 +93,7 @@ public class TeachersPage extends BasePage {
         final AttributeService attributeService = archive3ServerConnector.getAttributeService();
 
         List<ArchiveObject> archiveTeachers = findTeachers(archive3ServerConnector);
-        Collections.sort(archiveTeachers, new Comparator<ArchiveObject>() {
-            public int compare(ArchiveObject ao1, ArchiveObject ao2) {
-                return ao1.getName().compareTo(ao2.getName());
-            }
-        });
+        Collections.sort(archiveTeachers, (ArchiveObject ao1, ArchiveObject ao2) -> ao1.getName().compareTo(ao2.getName()));
 
         teachersNames = archiveTeachers.stream().map(searchResult -> searchResult.getName()).collect(Collectors.toList());
 
@@ -99,6 +107,16 @@ public class TeachersPage extends BasePage {
 
         retrieveAttributesValues(attributeMap);
 
+        List<ArchiveDocument> archiveDocuments = selectedTeacherCard.getDocuments();
+        Collections.sort(archiveDocuments, (ArchiveObject ao1, ArchiveObject ao2) -> ao1.getName().compareTo(ao2.getName()));
+
+        documentsNames = archiveDocuments.stream().map(searchResult -> searchResult.getName()).collect(Collectors.toList());
+        if (!documentsNames.isEmpty()) {
+        selectedDocumentName = documentsNames.get(0);
+        }
+        ListChoice<String> documentsNamesList = new ListChoice<>("documentsNamesList", new PropertyModel<String>(this, "selectedDocumentName"), documentsNames);
+        documentsNamesList.setMaxRows(2);
+
         final TextField<String> teacherName = new TextField<String>("teacherName", new PropertyModel<String>(this, "teacherNameValue"));
         final TextField<String> position = new TextField<String>("position", new PropertyModel<String>(this, "positionValue"));
         final RadioChoice<String> academicDegrees = new RadioChoice<String>("academicDegrees", new PropertyModel<String>(this, "selectedAcademicDegree"), academicDegreesList);
@@ -111,15 +129,28 @@ public class TeachersPage extends BasePage {
         Form<?> teachersNamesForm = new Form<Void>("teachersNamesForm") {
             @Override
             public void onSubmit() {
+                archive3ServerConnector.logoff();
                 pageParameters.remove("selectedTeacherName");
                 pageParameters.add("selectedTeacherName", selectedTeacherName);
                 setResponsePage(TeachersPage.class, pageParameters);
             }
         };
 
+        Form<?> addTeacherForm = new Form<Void>("addTeacherForm") {
+            @Override
+            public void onSubmit() {
+                archive3ServerConnector.logoff();
+                pageParameters.remove("selectedTeacherName");
+                pageParameters.add("parentID", selectedTeacherArchiveObject.getParentObject());
+                setResponsePage(AddTeacherPage.class, pageParameters);
+            }
+        };
+
         Form<?> selectedTeacherInfoForm = new Form<Void>("selectedTeacherInfoForm") {
             @Override
             public void onSubmit() {
+                dataService.renameObject(selectedTeacherCard.getId(), teacherNameValue);
+
                 attributeMap.get(TEACHER_NAME_ATTR_ID).get(0).setValue(teacherNameValue);
                 attributeMap.get(POSITION_ATTR_ID).get(0).setValue(positionValue);
 
@@ -153,6 +184,66 @@ public class TeachersPage extends BasePage {
 
                 List<AttributeValue> updatedAttributesList = attributeMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
                 attributeService.setAttributeValuesForAnObject(selectedTeacherCard.getId(), updatedAttributesList);
+
+                archive3ServerConnector.logoff();
+                pageParameters.remove("selectedTeacherName");
+                pageParameters.add("selectedTeacherName", teacherNameValue);
+                setResponsePage(TeachersPage.class, pageParameters);
+            }
+        };
+
+        Form<?> documentsForm = new Form<Void>("documentsForm") {
+            @Override
+            protected void onSubmit() {
+                final ArchiveObject selectedDocumentArchiveObject = archiveDocuments.stream().filter(searchResult -> searchResult.getName().equals(selectedDocumentName)).findFirst().orElse(null);
+                dataService.deleteObjects(selectedDocumentArchiveObject.getObjectId());
+                archive3ServerConnector.logoff();
+                setResponsePage(TeachersPage.class, pageParameters);
+            }
+        };
+
+        Form<?> uploadDocument = new Form<Void>("uploadDocument") {
+            @Override
+            protected void onSubmit() {
+                final FileUpload fileUpload = fileUploadField.getFileUpload();
+                if (fileUpload != null) {
+                    File file = new File(fileUpload.getClientFileName());
+
+                    if (file.exists()) {
+                        file.delete();
+                    }
+
+                    try {
+                        file.createNewFile();
+                        fileUpload.writeTo(file);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error creating new file.", e);
+                    }
+
+                    final List<ArchiveDocument> documents = new ArrayList<>();
+                    ArchiveDocument document = new ArchiveDocument();
+                    document.setName(fileUpload.getClientFileName());
+                    document.setParentObject(selectedTeacherCard.getId());
+                    document.setDocumentURL(file.getName());
+                    document.setDocumentSize(file.length());
+                    document = (ArchiveDocument) archive3ServerConnector.getDataService().createArchiveObject(document);
+                    documents.add(document);
+
+                    final String sessionID = archive3ServerConnector.getDocumentService().openSession(documents);
+                    final ArchiveFileUploader uploader = new ArchiveFileUploader(archive3ServerConnector);
+
+                    try {
+                        uploader.uploadFile(new File(document.getDocumentURL()), document, sessionID, new FileUploadListener() {
+                        });
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error uploading new file.", e);
+                    } finally {
+                        file.delete();
+                    }
+
+                    archive3ServerConnector.logoff();
+                    setResponsePage(TeachersPage.class, pageParameters);
+                }
             }
         };
 
@@ -160,13 +251,9 @@ public class TeachersPage extends BasePage {
             @Override
             public void onSubmit() {
                 dataService.deleteObjects(selectedTeacherCard.getId());
-            }
-        };
-
-        Form<?> addTeacherForm = new Form<Void>("addTeacherForm") {
-            @Override
-            public void onSubmit() {
-//                действие на кнопку "Добавить преподавателя"
+                archive3ServerConnector.logoff();
+                pageParameters.remove("selectedTeacherName");
+                setResponsePage(TeachersPage.class, pageParameters);
             }
         };
 
@@ -174,6 +261,7 @@ public class TeachersPage extends BasePage {
         teachersNamesForm.add(teachersNamesList);
 
         add(addTeacherForm);
+
         add(selectedTeacherInfoForm);
         selectedTeacherInfoForm.add(teacherName);
         selectedTeacherInfoForm.add(position);
@@ -183,6 +271,12 @@ public class TeachersPage extends BasePage {
         selectedTeacherInfoForm.add(phone);
         selectedTeacherInfoForm.add(email);
         selectedTeacherInfoForm.add(shortDescription);
+
+        add(documentsForm);
+        documentsForm.add(documentsNamesList);
+        add(uploadDocument);
+        uploadDocument.add(fileUploadField = new FileUploadField("fileUploadField"));
+
         add(deleteTeacherForm);
 
     }
@@ -211,12 +305,12 @@ public class TeachersPage extends BasePage {
         CompleteCard selectedTeacherCard;
 
         if (selectedTeacherName != null) {
-            final ArchiveObject selectedTeacherArchiveObject = archiveTeachers.stream().filter(searchResult -> searchResult.getName().equals(selectedTeacherName)).findFirst().orElse(null);
+            selectedTeacherArchiveObject = archiveTeachers.stream().filter(searchResult -> searchResult.getName().equals(selectedTeacherName)).findFirst().orElse(null);
             selectedTeacherCard = dataService.getCompleteCard(selectedTeacherArchiveObject.getObjectId());
         } else {
             selectedTeacherName = archiveTeachers.get(0).getName();
             pageParameters.add("selectedTeacherName", selectedTeacherName);
-            final ArchiveObject selectedTeacherArchiveObject = archiveTeachers.get(0);
+            selectedTeacherArchiveObject = archiveTeachers.get(0);
             selectedTeacherCard = dataService.getCompleteCard(selectedTeacherArchiveObject.getObjectId());
         }
 

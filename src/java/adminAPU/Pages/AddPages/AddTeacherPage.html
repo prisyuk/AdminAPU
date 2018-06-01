@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+            <div id="content">
+                <wicket:extend>
+
+                    <form wicket:id="addTeacherInfoForm">
+                        <table style="width: 1200px">
+                            <tr>
+                                <td><label>ФИО</label></td>
+                                <td colspan="3"><input wicket:id="teacherName" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td><label>Должность</label></td>
+                                <td colspan="3"><input wicket:id="position" type="text" style="width: 500px" /></td>
+                            </tr>
+                            <tr>
+                                <td><label>Ученая степень</label></td>
+                                <td><span wicket:id="academicDegrees"></span></td>
+                                <td><label>Уровни обучения</label></td>
+                                <td>
+                                    <a>
+                                        <input type="checkbox" wicket:id="baccalaureateCheckbox" />
+                                        <label>Бакалавриат</label>
+                                    </a>
+                                    <br/>
+                                    <a>
+                                        <input type="checkbox" wicket:id="magistracyCheckbox" />
+                                        <label>Магистратура</label>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><label>Контактный телефон</label></td>
+                                <td><input wicket:id="phone" type="text" /></td>
+                                <td><label>Электронная почта</label></td>
+                                <td><input wicket:id="email" type="text" /></td>
+                            </tr>
+                            <tr>
+                                <td><label>Краткое описание</label></td>
+                                <td colspan="3"><textarea wicket:id="shortDescription" rows="3" cols="92" style="resize: none" /></td>
+                            </tr>
+                            <tr></tr>
+                            <tr>
+                                <td colspan="4" style="text-align: right"><input type="submit" value="Добавить преподавателя" style="width: 200px" /></td>
+                            </tr>
+                        </table>
+                    </form>
+
+                    <form wicket:id="cancelForm">
+                        <table style="height: 100%">
+                            <tr>
+                                <td style="width: 1200px; text-align: right"><input id="deleteButton" type="submit" value="Отмена" style="width: 200px" /></td>
+                            </tr>
+                        </table>
+                    </form>
+
+                </wicket:extend>
+            </div>
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>

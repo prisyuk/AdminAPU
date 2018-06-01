@@ -19,7 +19,6 @@ import com.alee.archive3.api.ws.SearchService;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +106,8 @@ public class ProgramPage extends BasePage {
     private String selectedSubjectName;
     private String selectedCycle;
 
+    private ArchiveObject selectedSubjectArchiveObject;
+
     public ProgramPage(PageParameters pageParameters) {
 
         selectedSubjectName = pageParameters.get("selectedSubjectName").toString();
@@ -127,11 +128,7 @@ public class ProgramPage extends BasePage {
         final AttributeService attributeService = archive3ServerConnector.getAttributeService();
 
         List<ArchiveObject> archiveSubjects = findSubjects(archive3ServerConnector);
-        Collections.sort(archiveSubjects, new Comparator<ArchiveObject>() {
-            public int compare(ArchiveObject ao1, ArchiveObject ao2) {
-                return ao1.getName().compareTo(ao2.getName());
-            }
-        });
+        Collections.sort(archiveSubjects, (ArchiveObject ao1, ArchiveObject ao2) -> ao1.getName().compareTo(ao2.getName()));
 
         subjectsNames = archiveSubjects.stream().map(searchResult -> searchResult.getName()).collect(Collectors.toList());
         ListChoice<String> subjectsNamesList = new ListChoice<>("subjectsNamesList", new PropertyModel<String>(this, "selectedSubjectName"), subjectsNames);
@@ -163,9 +160,20 @@ public class ProgramPage extends BasePage {
         Form<?> subjectsNamesForm = new Form<Void>("subjectsNamesForm") {
             @Override
             public void onSubmit() {
+                archive3ServerConnector.logoff();
                 pageParameters.remove("selectedSubjectName");
                 pageParameters.add("selectedSubjectName", selectedSubjectName);
                 setResponsePage(ProgramPage.class, pageParameters);
+            }
+        };
+
+        Form<?> addSubjectForm = new Form<Void>("addSubjectForm") {
+            @Override
+            public void onSubmit() {
+                archive3ServerConnector.logoff();
+                pageParameters.remove("selectedSubjectName");
+                pageParameters.add("parentID", selectedSubjectArchiveObject.getParentObject());
+                setResponsePage(AddSubjectPage.class, pageParameters);
             }
         };
 
@@ -246,6 +254,11 @@ public class ProgramPage extends BasePage {
 
                 List<AttributeValue> updatedAttributesList = attributeMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
                 attributeService.setAttributeValuesForAnObject(selectedSubjectCard.getId(), updatedAttributesList);
+
+                archive3ServerConnector.logoff();
+                pageParameters.remove("selectedSubjectName");
+                pageParameters.add("selectedSubjectName", subjectNameValue);
+                setResponsePage(ProgramPage.class, pageParameters);
             }
         };
 
@@ -253,14 +266,9 @@ public class ProgramPage extends BasePage {
             @Override
             public void onSubmit() {
                 dataService.deleteObjects(selectedSubjectCard.getId());
-            }
-        };
-
-        Form<?> addSubjectForm = new Form<Void>("addSubjectForm") {
-            @Override
-            public void onSubmit() {
+                archive3ServerConnector.logoff();
                 pageParameters.remove("selectedSubjectName");
-                setResponsePage(AddSubjectPage.class, pageParameters);
+                setResponsePage(ProgramPage.class, pageParameters);
             }
         };
 
@@ -271,6 +279,7 @@ public class ProgramPage extends BasePage {
         subjectsNamesForm.add(subjectsNamesList);
 
         add(addSubjectForm);
+
         add(selectedSubjectInfoForm);
         selectedSubjectInfoForm.add(subjectName);
         selectedSubjectInfoForm.add(pulpitName);
@@ -287,6 +296,7 @@ public class ProgramPage extends BasePage {
         selectedSubjectInfoForm.add(laboratoryHoursPerWeek);
         selectedSubjectInfoForm.add(totalHoursPerWeek);
         selectedSubjectInfoForm.add(shortDescription);
+
         add(deleteSubjectForm);
 
     }
@@ -345,12 +355,12 @@ public class ProgramPage extends BasePage {
         CompleteCard selectedSubjectCard;
 
         if (selectedSubjectName != null) {
-            final ArchiveObject selectedSubjectArchiveObject = archiveSubjects.stream().filter(searchResult -> searchResult.getName().equals(selectedSubjectName)).findFirst().orElse(null);
+            selectedSubjectArchiveObject = archiveSubjects.stream().filter(searchResult -> searchResult.getName().equals(selectedSubjectName)).findFirst().orElse(null);
             selectedSubjectCard = dataService.getCompleteCard(selectedSubjectArchiveObject.getObjectId());
         } else {
             selectedSubjectName = archiveSubjects.get(0).getName();
             pageParameters.add("selectedSubjectName", selectedSubjectName);
-            final ArchiveObject selectedSubjectArchiveObject = archiveSubjects.get(0);
+            selectedSubjectArchiveObject = archiveSubjects.get(0);
             selectedSubjectCard = dataService.getCompleteCard(selectedSubjectArchiveObject.getObjectId());
         }
 

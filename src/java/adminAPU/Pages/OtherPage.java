@@ -122,8 +122,6 @@ public class OtherPage extends BasePage {
         statisticsForm.add(graduaters);
         statisticsForm.add(excellentGraduaters);
 
-        archive3ServerConnector.logoff();
-
     }
 
 }

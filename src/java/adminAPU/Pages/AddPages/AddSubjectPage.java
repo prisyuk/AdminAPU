@@ -3,24 +3,12 @@ package adminAPU.Pages.AddPages;
 import adminAPU.BasePage;
 import adminAPU.Pages.ProgramPage;
 import com.alee.archive3.Archive3ServerConnector;
-import com.alee.archive3.api.data.ArchiveObject;
 import com.alee.archive3.api.data.AttributeValue;
 import com.alee.archive3.api.data.Card;
-import com.alee.archive3.api.data.CompleteCard;
-import com.alee.archive3.api.exceptions.ArchiveSystemError;
-import com.alee.archive3.api.exceptions.UnknownServiceException;
 import com.alee.archive3.api.network.Requisite;
-import com.alee.archive3.api.search.AdvSearchableField;
-import com.alee.archive3.api.search.FieldType;
-import com.alee.archive3.api.search.MatchType;
-import com.alee.archive3.api.search.SearchRequest;
-import com.alee.archive3.api.ws.AttributeService;
 import com.alee.archive3.api.ws.DataService;
-import com.alee.archive3.api.ws.SearchService;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +16,6 @@ import java.util.stream.Collectors;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.CheckBox;
 import org.apache.wicket.markup.html.form.Form;
-import org.apache.wicket.markup.html.form.ListChoice;
 import org.apache.wicket.markup.html.form.RadioChoice;
 import org.apache.wicket.markup.html.form.TextArea;
 import org.apache.wicket.markup.html.form.TextField;
@@ -104,15 +91,14 @@ public class AddSubjectPage extends BasePage {
     private boolean courseWorkCheckboxValue;
     private boolean examCheckboxValue;
 
-    private List<String> subjectsNames;
-    private String selectedSubjectName;
-    private String selectedCycle;
+    private String selectedCycle = "Другое";
 
     private Card card;
+    private String parentID;
 
     public AddSubjectPage(PageParameters pageParameters) {
 
-        selectedSubjectName = pageParameters.get("selectedSubjectName").toString();
+        parentID = pageParameters.get("parentID").toString();
 
         educationLevel = pageParameters.get("educationLevel").toString();
         course = pageParameters.get("course").toString();
@@ -127,23 +113,22 @@ public class AddSubjectPage extends BasePage {
         archive3ServerConnector.authenticate("admin", "ApU_36oe", requisite);
 
         final DataService dataService = archive3ServerConnector.getDataService();
-        final AttributeService attributeService = archive3ServerConnector.getAttributeService();
 
-        final TextField<String> subjectName = new TextField<>("subjectName", new PropertyModel<String>(this, "subjectNameValue"));
-        final TextField<String> pulpitName = new TextField<>("pulpitName", new PropertyModel<String>(this, "pulpitNameValue"));
+        final TextField<String> subjectName = new TextField<String>("subjectName", new PropertyModel<String>(this, "subjectNameValue"));
+        final TextField<String> pulpitName = new TextField<String>("pulpitName", new PropertyModel<String>(this, "pulpitNameValue"));
         final RadioChoice<String> cycles = new RadioChoice<String>("cycles", new PropertyModel<String>(this, "selectedCycle"), cyclesList);
         final CheckBox differentiatedCreditCheckbox = new CheckBox("differentiatedCreditCheckbox", new PropertyModel<>(this, "differentiatedCreditCheckboxValue"));
         final CheckBox courseProjectCheckbox = new CheckBox("courseProjectCheckbox", new PropertyModel<>(this, "courseProjectCheckboxValue"));
         final CheckBox courseWorkCheckbox = new CheckBox("courseWorkCheckbox", new PropertyModel<>(this, "courseWorkCheckboxValue"));
         final CheckBox examCheckbox = new CheckBox("examCheckbox", new PropertyModel<>(this, "examCheckboxValue"));
-        final TextField<String> classHours = new TextField<>("classHours", new PropertyModel<String>(this, "classHoursValue"));
-        final TextField<String> selfHours = new TextField<>("selfHours", new PropertyModel<String>(this, "selfHoursValue"));
-        final TextField<String> totalDuration = new TextField<>("totalDuration", new PropertyModel<String>(this, "totalDurationValue"));
-        final TextField<String> lectureHoursPerWeek = new TextField<>("lectureHoursPerWeek", new PropertyModel<String>(this, "lectureHoursPerWeekValue"));
-        final TextField<String> practicalHoursPerWeek = new TextField<>("practicalHoursPerWeek", new PropertyModel<String>(this, "practicalHoursPerWeekValue"));
-        final TextField<String> laboratoryHoursPerWeek = new TextField<>("laboratoryHoursPerWeek", new PropertyModel<String>(this, "laboratoryHoursPerWeekValue"));
-        final TextField<String> totalHoursPerWeek = new TextField<>("totalHoursPerWeek", new PropertyModel<String>(this, "totalHoursPerWeekValue"));
-        final TextArea<String> shortDescription = new TextArea<>("shortDescription", new PropertyModel<String>(this, "shortDescriptionValue"));
+        final TextField<String> classHours = new TextField<String>("classHours", new PropertyModel<String>(this, "classHoursValue"));
+        final TextField<String> selfHours = new TextField<String>("selfHours", new PropertyModel<String>(this, "selfHoursValue"));
+        final TextField<String> totalDuration = new TextField<String>("totalDuration", new PropertyModel<String>(this, "totalDurationValue"));
+        final TextField<String> lectureHoursPerWeek = new TextField<String>("lectureHoursPerWeek", new PropertyModel<String>(this, "lectureHoursPerWeekValue"));
+        final TextField<String> practicalHoursPerWeek = new TextField<String>("practicalHoursPerWeek", new PropertyModel<String>(this, "practicalHoursPerWeekValue"));
+        final TextField<String> laboratoryHoursPerWeek = new TextField<String>("laboratoryHoursPerWeek", new PropertyModel<String>(this, "laboratoryHoursPerWeekValue"));
+        final TextField<String> totalHoursPerWeek = new TextField<String>("totalHoursPerWeek", new PropertyModel<String>(this, "totalHoursPerWeekValue"));
+        final TextArea<String> shortDescription = new TextArea<String>("shortDescription", new PropertyModel<String>(this, "shortDescriptionValue"));
 
         Form<?> titleForm = new Form<Void>("titleForm") {
         };
@@ -151,64 +136,97 @@ public class AddSubjectPage extends BasePage {
         Form<?> addSubjectInfoForm = new Form<Void>("addSubjectInfoForm") {
             @Override
             public void onSubmit() {
+                card = new Card(subjectNameValue);
+                card.setParentObject(parentID);
                 Map<String, List<AttributeValue>> attributeMap = new HashMap<>();
 
-                attributeMap.get(TYPE_OF_CARD_ATTR_ID).get(0).setValue(SUBJECT_ID);
-                attributeMap.get(TYPE_OF_CARD_ATTR_ID).get(0).setStringValue("Предмет");
+                attributeMap.put(TYPE_OF_CARD_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue typeOfCardAttribute = new AttributeValue(TYPE_OF_CARD_ATTR_ID, SUBJECT_ID);
+                typeOfCardAttribute.setStringValue("Предмет");
+                attributeMap.get(TYPE_OF_CARD_ATTR_ID).add(typeOfCardAttribute);
 
+                attributeMap.put(EDUCATION_LEVEL_ATTR_ID, new ArrayList<AttributeValue>());
                 if (educationLevel.equals("Бакалавриат")) {
-                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).get(0).setValue(BACCALAUREATE_ID);
-                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).get(0).setStringValue("Бакалавриат");
+                    AttributeValue educationLevelAttribute = new AttributeValue(EDUCATION_LEVEL_ATTR_ID, BACCALAUREATE_ID);
+                    educationLevelAttribute.setStringValue("Бакалавриат");
+                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).add(educationLevelAttribute);
                 } else {
-                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).get(0).setValue(MAGISTRACY_ID);
-                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).get(0).setStringValue("Магистратура");
+                    AttributeValue educationLevelAttribute = new AttributeValue(EDUCATION_LEVEL_ATTR_ID, MAGISTRACY_ID);
+                    educationLevelAttribute.setStringValue("Магистратура");
+                    attributeMap.get(EDUCATION_LEVEL_ATTR_ID).add(educationLevelAttribute);
                 }
 
-                attributeMap.get(COURSE_ATTR_ID).get(0).setValue(course.substring(0, 1));
+                attributeMap.put(COURSE_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue courseAttribute = new AttributeValue(COURSE_ATTR_ID, course.substring(0, 1));
+                courseAttribute.setStringValue(course.substring(0, 1));
+                attributeMap.get(COURSE_ATTR_ID).add(courseAttribute);
 
+                attributeMap.put(SEMESTER_ATTR_ID, new ArrayList<AttributeValue>());
                 if (semester.length() == 10) {
-                    attributeMap.get(SEMESTER_ATTR_ID).get(0).setValue(semester.substring(0, 2));
+                    AttributeValue semesterAttribute = new AttributeValue(SEMESTER_ATTR_ID, semester.substring(0, 2));
+                    semesterAttribute.setStringValue(semester.substring(0, 2));
+                    attributeMap.get(SEMESTER_ATTR_ID).add(semesterAttribute);
                 } else {
-                    attributeMap.get(SEMESTER_ATTR_ID).get(0).setValue(semester.substring(0, 1));
+                    AttributeValue semesterAttribute = new AttributeValue(SEMESTER_ATTR_ID, semester.substring(0, 1));
+                    semesterAttribute.setStringValue(semester.substring(0, 1));
+                    attributeMap.get(SEMESTER_ATTR_ID).add(semesterAttribute);
                 }
 
-                attributeMap.get(SUBJECT_NAME_ATTR_ID).get(0).setValue(subjectNameValue);
-                attributeMap.get(PULPIT_NAME_ATTR_ID).get(0).setValue(pulpitNameValue);
+                attributeMap.put(SUBJECT_NAME_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue subjectNameAttribute = new AttributeValue(SUBJECT_NAME_ATTR_ID, subjectNameValue);
+                subjectNameAttribute.setStringValue(subjectNameValue);
+                attributeMap.get(SUBJECT_NAME_ATTR_ID).add(subjectNameAttribute);
 
+                attributeMap.put(PULPIT_NAME_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue pulpitNameAttribute = new AttributeValue(PULPIT_NAME_ATTR_ID, pulpitNameValue);
+                pulpitNameAttribute.setStringValue(pulpitNameValue);
+                attributeMap.get(PULPIT_NAME_ATTR_ID).add(pulpitNameAttribute);
+
+                attributeMap.put(CYCLE_ATTR_ID, new ArrayList<AttributeValue>());
                 if ("Технологический цикл".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(TECHNOLOGICAL_CYCLE_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Технологический цикл");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, TECHNOLOGICAL_CYCLE_ID);
+                    cycleAttribute.setStringValue("Технологический цикл");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Программная инженерия".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(PROGRAM_ENGINEERING_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Программная инженерия");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, PROGRAM_ENGINEERING_ID);
+                    cycleAttribute.setStringValue("Программная инженерия");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Информационная система".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(INFORMATION_SYSTEM_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Информационная система");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, INFORMATION_SYSTEM_ID);
+                    cycleAttribute.setStringValue("Информационная система");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Управление проектом".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(PROJECT_MANAGEMENT_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Управление проектом");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, PROJECT_MANAGEMENT_ID);
+                    cycleAttribute.setStringValue("Управление проектом");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Безопасность и защита".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(SAFETY_AND_PROTECTION_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Безопасность и защита");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, SAFETY_AND_PROTECTION_ID);
+                    cycleAttribute.setStringValue("Безопасность и защита");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Системный анализ".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(SYSTEM_ANALYSIS_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Системный анализ");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, SYSTEM_ANALYSIS_ID);
+                    cycleAttribute.setStringValue("Системный анализ");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Управление продуктом".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(PRODUCT_MANAGEMENT_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Управление продуктом");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, PRODUCT_MANAGEMENT_ID);
+                    cycleAttribute.setStringValue("Управление продуктом");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Проектирование системы".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(DESIGNING_THE_SYSTEM_ID);
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setStringValue("Проектирование системы");
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, DESIGNING_THE_SYSTEM_ID);
+                    cycleAttribute.setStringValue("Проектирование системы");
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
                 if ("Другое".equals(selectedCycle)) {
-                    attributeMap.get(CYCLE_ATTR_ID).get(0).setValue(null);
+                    AttributeValue cycleAttribute = new AttributeValue(CYCLE_ATTR_ID, null);
+                    cycleAttribute.setStringValue(null);
+                    attributeMap.get(CYCLE_ATTR_ID).add(cycleAttribute);
                 }
 
                 attributeMap.put(FORM_OF_PASSING_ATTR_ID, new ArrayList<AttributeValue>());
@@ -233,18 +251,51 @@ public class AddSubjectPage extends BasePage {
                     attributeMap.get(FORM_OF_PASSING_ATTR_ID).add(examAttribute);
                 }
 
-                attributeMap.get(CLASS_HOURS_ATTR_ID).get(0).setValue(classHoursValue);
-                attributeMap.get(SELF_HOURS_ATTR_ID).get(0).setValue(selfHoursValue);
-                attributeMap.get(TOTAL_DURATION_ATTR_ID).get(0).setValue(totalDurationValue);
-                attributeMap.get(LECTURE_HOURS_PER_WEEK_ATTR_ID).get(0).setValue(lectureHoursPerWeekValue);
-                attributeMap.get(PRACTICAL_HOURS_PER_WEEK_ATTR_ID).get(0).setValue(practicalHoursPerWeekValue);
-                attributeMap.get(LABORATORY_HOURS_PER_WEEK_ATTR_ID).get(0).setValue(laboratoryHoursPerWeekValue);
-                attributeMap.get(TOTAL_HOURS_PER_WEEK_ATTR_ID).get(0).setValue(totalHoursPerWeekValue);
-                attributeMap.get(SHORT_DESCRIPTION_ATTR_ID).get(0).setValue(shortDescriptionValue);
+                attributeMap.put(CLASS_HOURS_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue classHoursAttribute = new AttributeValue(CLASS_HOURS_ATTR_ID, classHoursValue);
+                classHoursAttribute.setStringValue(classHoursValue);
+                attributeMap.get(CLASS_HOURS_ATTR_ID).add(classHoursAttribute);
+
+                attributeMap.put(SELF_HOURS_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue selfHoursAttribute = new AttributeValue(SELF_HOURS_ATTR_ID, selfHoursValue);
+                selfHoursAttribute.setStringValue(selfHoursValue);
+                attributeMap.get(SELF_HOURS_ATTR_ID).add(selfHoursAttribute);
+
+                attributeMap.put(TOTAL_DURATION_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue totalDurationAttribute = new AttributeValue(TOTAL_DURATION_ATTR_ID, totalDurationValue);
+                totalDurationAttribute.setStringValue(totalDurationValue);
+                attributeMap.get(TOTAL_DURATION_ATTR_ID).add(totalDurationAttribute);
+
+                attributeMap.put(LECTURE_HOURS_PER_WEEK_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue lectureHoursPerWeekAttribute = new AttributeValue(LECTURE_HOURS_PER_WEEK_ATTR_ID, lectureHoursPerWeekValue);
+                lectureHoursPerWeekAttribute.setStringValue(lectureHoursPerWeekValue);
+                attributeMap.get(LECTURE_HOURS_PER_WEEK_ATTR_ID).add(lectureHoursPerWeekAttribute);
+
+                attributeMap.put(PRACTICAL_HOURS_PER_WEEK_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue practicalHoursPerWeekAttribute = new AttributeValue(PRACTICAL_HOURS_PER_WEEK_ATTR_ID, practicalHoursPerWeekValue);
+                practicalHoursPerWeekAttribute.setStringValue(practicalHoursPerWeekValue);
+                attributeMap.get(PRACTICAL_HOURS_PER_WEEK_ATTR_ID).add(practicalHoursPerWeekAttribute);
+
+                attributeMap.put(LABORATORY_HOURS_PER_WEEK_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue laboratoryHoursPerWeekAttribute = new AttributeValue(LABORATORY_HOURS_PER_WEEK_ATTR_ID, laboratoryHoursPerWeekValue);
+                laboratoryHoursPerWeekAttribute.setStringValue(laboratoryHoursPerWeekValue);
+                attributeMap.get(LABORATORY_HOURS_PER_WEEK_ATTR_ID).add(laboratoryHoursPerWeekAttribute);
+
+                attributeMap.put(TOTAL_HOURS_PER_WEEK_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue totalHoursPerWeekAttribute = new AttributeValue(TOTAL_HOURS_PER_WEEK_ATTR_ID, totalHoursPerWeekValue);
+                totalHoursPerWeekAttribute.setStringValue(totalHoursPerWeekValue);
+                attributeMap.get(TOTAL_HOURS_PER_WEEK_ATTR_ID).add(totalHoursPerWeekAttribute);
+
+                attributeMap.put(SHORT_DESCRIPTION_ATTR_ID, new ArrayList<AttributeValue>());
+                AttributeValue shortDescriptionAttribute = new AttributeValue(SHORT_DESCRIPTION_ATTR_ID, shortDescriptionValue);
+                shortDescriptionAttribute.setStringValue(shortDescriptionValue);
+                attributeMap.get(SHORT_DESCRIPTION_ATTR_ID).add(shortDescriptionAttribute);
 
                 List<AttributeValue> attributesList = attributeMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
                 dataService.createCompleteCard(card, true, attributesList, false);
 
+                archive3ServerConnector.logoff();
+                pageParameters.remove("parentID");
                 pageParameters.add("selectedSubjectName", subjectNameValue);
                 setResponsePage(ProgramPage.class, pageParameters);
             }
@@ -278,6 +329,7 @@ public class AddSubjectPage extends BasePage {
         addSubjectInfoForm.add(laboratoryHoursPerWeek);
         addSubjectInfoForm.add(totalHoursPerWeek);
         addSubjectInfoForm.add(shortDescription);
+
         add(cancelForm);
 
     }

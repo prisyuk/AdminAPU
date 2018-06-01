@@ -72,6 +72,25 @@
                                 </tr>
                             </table>
                         </form>
+                        <form wicket:id="documentsForm">
+                            <table>
+                                <tr style="vertical-align: top">
+                                    <td><label>Фотографии</label></td>
+                                    <td><select wicket:id="documentsNamesList" style="width: 200px" />
+                                        <br/>
+                                        <input id="deleteButton" type="submit" value="Удалить фотографию" style="width: 200px" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </form>
+                        <form wicket:id="uploadDocument">
+                            <table>
+                                <tr>
+                                    <td><input wicket:id="fileUploadField" type="file" /></td>
+                                    <td><input id="addButton" type="submit" value="Загрузить фотографию" /></td>
+                                </tr>
+                            </table>
+                        </form>
                         <form wicket:id="deleteTeacherForm">
                             <table style="height: 100%">
                                 <tr>

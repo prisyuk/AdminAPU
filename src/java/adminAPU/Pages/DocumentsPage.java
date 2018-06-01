@@ -5,15 +5,19 @@ import com.alee.archive3.Archive3ServerConnector;
 import com.alee.archive3.api.data.ArchiveDocument;
 import com.alee.archive3.api.data.ArchiveObject;
 import com.alee.archive3.api.data.CompleteCard;
+import com.alee.archive3.api.filetransfer.ArchiveFileUploader;
+import com.alee.archive3.api.filetransfer.FileUploadListener;
 import com.alee.archive3.api.network.Requisite;
 import com.alee.archive3.api.ws.DataService;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.wicket.markup.html.basic.Label;
 import org.apache.wicket.markup.html.form.Form;
 import org.apache.wicket.markup.html.form.ListChoice;
+import org.apache.wicket.markup.html.form.upload.FileUpload;
 import org.apache.wicket.markup.html.form.upload.FileUploadField;
 import org.apache.wicket.model.PropertyModel;
 import org.apache.wicket.request.mapper.parameter.PageParameters;
@@ -50,11 +54,7 @@ public class DocumentsPage extends BasePage {
         }
 
         List<ArchiveDocument> archiveDocuments = documentsCard.getDocuments();
-        Collections.sort(archiveDocuments, new Comparator<ArchiveObject>() {
-            public int compare(ArchiveObject ao1, ArchiveObject ao2) {
-                return ao1.getName().compareTo(ao2.getName());
-            }
-        });
+        Collections.sort(archiveDocuments, (ArchiveObject ao1, ArchiveObject ao2) -> ao1.getName().compareTo(ao2.getName()));
 
         documentsNames = archiveDocuments.stream().map(searchResult -> searchResult.getName()).collect(Collectors.toList());
         selectedDocumentName = documentsNames.get(0);
@@ -64,20 +64,54 @@ public class DocumentsPage extends BasePage {
         Form<?> uploadDocument = new Form<Void>("uploadDocument") {
             @Override
             protected void onSubmit() {
-//                final FileUpload fileUpload = fileUploadField.getFileUpload();
-////                if (fileUpload != null) {
-////
-////                }
+                final FileUpload fileUpload = fileUploadField.getFileUpload();
+                if (fileUpload != null) {
+                    File file = new File(fileUpload.getClientFileName());
+
+                    if (file.exists()) {
+                        file.delete();
+                    }
+
+                    try {
+                        file.createNewFile();
+                        fileUpload.writeTo(file);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error creating new file.", e);
+                    }
+
+                    final List<ArchiveDocument> documents = new ArrayList<>();
+                    ArchiveDocument document = new ArchiveDocument();
+                    document.setName(fileUpload.getClientFileName());
+                    document.setParentObject(documentsCard.getId());
+                    document.setDocumentURL(file.getName());
+                    document.setDocumentSize(file.length());
+                    document = (ArchiveDocument) archive3ServerConnector.getDataService().createArchiveObject(document);
+                    documents.add(document);
+
+                    final String sessionID = archive3ServerConnector.getDocumentService().openSession(documents);
+                    final ArchiveFileUploader uploader = new ArchiveFileUploader(archive3ServerConnector);
+
+                    try {
+                        uploader.uploadFile(new File(document.getDocumentURL()), document, sessionID, new FileUploadListener() {});
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error uploading new file.", e);
+                    } finally {
+                        file.delete();
+                    }
+
+                    archive3ServerConnector.logoff();
+                    setResponsePage(DocumentsPage.class, pageParameters);
+                }
             }
         };
 
-        Form<?> documentsForm = new Form<Void>("documentsForm") {};
-
-        Form<?> deleteDocument = new Form<Void>("deleteDocument") {
+        Form<?> documentsForm = new Form<Void>("documentsForm") {
             @Override
             protected void onSubmit() {
                 final ArchiveObject selectedDocumentArchiveObject = archiveDocuments.stream().filter(searchResult -> searchResult.getName().equals(selectedDocumentName)).findFirst().orElse(null);
                 dataService.deleteObjects(selectedDocumentArchiveObject.getObjectId());
+
+                archive3ServerConnector.logoff();
                 setResponsePage(DocumentsPage.class, pageParameters);
             }
         };
@@ -88,8 +122,6 @@ public class DocumentsPage extends BasePage {
 
         add(documentsForm);
         documentsForm.add(documentsNamesList);
-
-        add(deleteDocument);
 
     }
 
