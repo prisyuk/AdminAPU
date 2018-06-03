@@ -140,9 +140,9 @@ public class HeaderPanel extends Panel {
             public void onClick() {
                 PageParameters pageParameters = new PageParameters();
                 pageParameters.add("educationLevel", "Магистратура");
-                pageParameters.add("course", "6 курс");
-                pageParameters.add("semester", "12 семестр");
-                setResponsePage(ProgramPage.class, pageParameters);
+//                pageParameters.add("course", "6 курс");
+//                pageParameters.add("semester", "12 семестр");
+                setResponsePage(DocumentsPage.class, pageParameters);
             }
         });
 
@@ -153,23 +153,23 @@ public class HeaderPanel extends Panel {
             }
         });
 
-//        add(new Link("baccalaureateGraduatersLink") {
-//            @Override
-//            public void onClick() {
-//                PageParameters pageParameters = new PageParameters();
-//                pageParameters.add("educationLevel", "Бакалавриат");
-//                setResponsePage(GraduatersPage.class, pageParameters);
-//            }
-//        });
-//
-//        add(new Link("magistracyGraduatersLink") {
-//            @Override
-//            public void onClick() {
-//                PageParameters pageParameters = new PageParameters();
-//                pageParameters.add("educationLevel", "Магистратура");
-//                setResponsePage(GraduatersPage.class, pageParameters);
-//            }
-//        });
+        add(new Link("baccalaureateGraduatersLink") {
+            @Override
+            public void onClick() {
+                PageParameters pageParameters = new PageParameters();
+                pageParameters.add("educationLevel", "Бакалавриат");
+                setResponsePage(GraduatersPage.class, pageParameters);
+            }
+        });
+
+        add(new Link("magistracyGraduatersLink") {
+            @Override
+            public void onClick() {
+                PageParameters pageParameters = new PageParameters();
+                pageParameters.add("educationLevel", "Магистратура");
+                setResponsePage(GraduatersPage.class, pageParameters);
+            }
+        });
 
         add(new Link("baccalaureateDocumentsLink") {
             @Override
