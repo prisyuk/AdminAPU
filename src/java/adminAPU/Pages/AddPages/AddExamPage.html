@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+            <div id="content">
+                <wicket:extend>
+
+                    <div id="leftContent">
+                        <form wicket:id="titleForm">
+                            <p style="font-size: 16px">
+                                <span wicket:id="educationLevelLabel" />
+                                <br/>
+                                <span wicket:id="selectedGroupLabel" />
+                            </p>
+                        </form>
+                    </div>
+
+                    <div id="rightContent">
+                        <form wicket:id="addExamInfoForm">
+                            <table>
+                                <tr>
+                                    <td><label>Предмет</label></td>
+                                    <td colspan="3"><input wicket:id="subjectName" type="text" style="width: 650px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Альтернативный предмет</label></td>
+                                    <td colspan="3"><input wicket:id="altSubjectName" type="text" style="width: 650px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Дата</label></td>
+                                    <td><input wicket:id="date" type="text" style="width: 67px" /></td>
+                                    <td><label>Время</label></td>
+                                    <td><input wicket:id="time" type="text" style="width: 33px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Аудитория</label></td>
+                                    <td colspan="3"><input wicket:id="lectureHall" type="text" style="width: 31px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Преподаватель</label></td>
+                                    <td colspan="3"><input wicket:id="teacherName" type="text" style="width: 400px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Альтернативный преподаватель</label></td>
+                                    <td colspan="3"><input wicket:id="altTeacherName" type="text" style="width: 400px" /></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" style="text-align: right"><input type="submit" value="Добавить выпускника" style="width: 200px" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                        <form wicket:id="cancelForm">
+                            <table style="height: 100%">
+                                <tr>
+                                    <td style="width: 880px; text-align: right"><input id="deleteButton" type="submit" value="Отмена" style="width: 200px" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+
+                </wicket:extend>
+            </div>
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>

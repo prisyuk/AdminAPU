@@ -1,6 +1,7 @@
 package adminAPU;
 
 import adminAPU.Pages.DocumentsPage;
+import adminAPU.Pages.ExamsPage;
 import adminAPU.Pages.OtherPage;
 import adminAPU.Pages.GraduatersPage;
 import adminAPU.Pages.ProgramPage;
@@ -140,8 +141,6 @@ public class HeaderPanel extends Panel {
             public void onClick() {
                 PageParameters pageParameters = new PageParameters();
                 pageParameters.add("educationLevel", "Магистратура");
-//                pageParameters.add("course", "6 курс");
-//                pageParameters.add("semester", "12 семестр");
                 setResponsePage(DocumentsPage.class, pageParameters);
             }
         });
@@ -170,6 +169,24 @@ public class HeaderPanel extends Panel {
                 setResponsePage(GraduatersPage.class, pageParameters);
             }
         });
+
+        add(new Link("baccalaureateExamsLink") {
+            @Override
+            public void onClick() {
+                PageParameters pageParameters = new PageParameters();
+                pageParameters.add("educationLevel", "Бакалавриат");
+                setResponsePage(ExamsPage.class, pageParameters);
+            }
+        });
+
+//        add(new Link("magistracyExamsLink") {
+//            @Override
+//            public void onClick() {
+//                PageParameters pageParameters = new PageParameters();
+//                pageParameters.add("educationLevel", "Магистратура");
+//                setResponsePage(ExamsPage.class, pageParameters);
+//            }
+//        });
 
         add(new Link("baccalaureateDocumentsLink") {
             @Override

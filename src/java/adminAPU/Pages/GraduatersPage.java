@@ -69,7 +69,6 @@ public class GraduatersPage extends BasePage {
     private FileUploadField fileUploadField;
 
     private Card card;
-    private Card defaultNewGraduaterCard;
 
     public GraduatersPage(PageParameters pageParameters) {
 

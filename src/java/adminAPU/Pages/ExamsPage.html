@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:wicket="http://wicket.apache.org/dtds.data/wicket-xhtml1.4-strict.dtd"
+      xml:lang="en"
+      lang="en">
+    <head>
+        <wicket:head>
+            <title>Система управления контентом портала кафедры АПУ</title>
+            <wicket:link>
+                <link rel="stylesheet" type="text/css" href="style.css" />
+            </wicket:link>
+        </wicket:head>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="headerPanel" wicket:id="headerPanel"></div>
+            <div id="content">
+                <wicket:extend>
+
+                    <div id="leftContent">
+                        <form wicket:id="addNewGroupForm">
+                            <p style="font-size: 16px">
+                                <span wicket:id="educationLevelLabel" />
+                                <br/>
+                                <span wicket:id="selectedGroupLabel" />
+                            </p>
+                            <input wicket:id="newGroup" type="text" placeholder="Введите группу" style="width: 95px" />
+                            <input id="addButton" type="submit" value="Добавить группу" />
+                        </form>
+                        <form wicket:id="groupsForm">
+                            <p><select wicket:id="groupsList" style="width: 320px" /></p>
+                            <input type="submit" value="Выбрать группу" style="width: 320px" />
+                        </form>
+                        <br/>
+                        <form wicket:id="deleteGroupForm">
+                            <input id="deleteButton" type="submit" value="Удалить группу (сначала нужно выбрать)" style="width: 320px" />
+                        </form>
+                        <br/><br/><br/>
+                        <form wicket:id="examsNamesForm">
+                            <p><select wicket:id="examsNamesList" style="width: 320px" /></p>
+                            <input type="submit" value="Показать информацию" style="width: 320px" />
+                        </form>
+                        <br/>
+                        <form wicket:id="addExamForm">
+                            <input id="addButton" type="submit" value="Добавить экзамен" style="width: 320px" />
+                        </form>
+                    </div>
+
+                    <div id="rightContent">
+                        <form wicket:id="selectedExamInfoForm">
+                            <table>
+                                <tr>
+                                    <td><label>Предмет</label></td>
+                                    <td colspan="3"><input wicket:id="subjectName" type="text" style="width: 650px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Альтернативный предмет</label></td>
+                                    <td colspan="3"><input wicket:id="altSubjectName" type="text" style="width: 650px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Дата</label></td>
+                                    <td><input wicket:id="date" type="text" style="width: 67px" /></td>
+                                    <td><label>Время</label></td>
+                                    <td><input wicket:id="time" type="text" style="width: 33px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Аудитория</label></td>
+                                    <td colspan="3"><input wicket:id="lectureHall" type="text" style="width: 31px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Преподаватель</label></td>
+                                    <td colspan="3"><input wicket:id="teacherName" type="text" style="width: 400px" /></td>
+                                </tr>
+                                <tr>
+                                    <td><label>Альтернативный преподаватель</label></td>
+                                    <td colspan="3"><input wicket:id="altTeacherName" type="text" style="width: 400px" /></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="4" style="text-align: right"><input type="submit" value="Обновить информацию" style="width: 200px" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                        <form wicket:id="deleteExamForm">
+                            <table style="height: 100%">
+                                <tr>
+                                    <td style="width: 880px; text-align: right"><input id="deleteButton" type="submit" value="Удалить экзамен" style="width: 200px" /></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+
+                </wicket:extend>
+            </div>
+            <div id="footerPanel" wicket:id="footerPanel"></div>
+        </div>
+    </body>
+</html>
