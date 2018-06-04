@@ -1,6 +1,7 @@
 package adminAPU.Pages;
 
 import adminAPU.BasePage;
+import adminAPU.Pages.AddPages.AddGraduaterPage;
 import com.alee.archive3.Archive3ServerConnector;
 import com.alee.archive3.api.data.ArchiveDocument;
 import com.alee.archive3.api.data.ArchiveObject;
@@ -65,10 +66,9 @@ public class GraduatersPage extends BasePage {
     private List<String> documentsNames;
     private String selectedDocumentName;
 
-//    private ArchiveObject selectedTeacherArchiveObject;
     private FileUploadField fileUploadField;
 
-    private Card newYearCard;
+    private Card card;
     private Card defaultNewGraduaterCard;
 
     public GraduatersPage(PageParameters pageParameters) {
@@ -77,7 +77,7 @@ public class GraduatersPage extends BasePage {
         selectedYear = pageParameters.get("selectedYear").toString();
         selectedGraduaterName = pageParameters.get("selectedGraduaterName").toString();
         final Label educationLevelLabel = new Label("educationLevelLabel", educationLevel);
-        final TextField<String> newYear = new TextField<String>("newYear", new PropertyModel<String>(this, "newYearValue"));
+        final TextField<String> newYear = new TextField<>("newYear", new PropertyModel<>(this, "newYearValue"));
 
         final Archive3ServerConnector archive3ServerConnector = new Archive3ServerConnector("apu.su", 80);
         final Requisite requisite = new Requisite();
@@ -99,7 +99,9 @@ public class GraduatersPage extends BasePage {
 
         if (selectedYear == null) {
             selectedYear = years.get(0);
+            pageParameters.add("selectedYear", selectedYear);
         }
+        final Label selectedYearLabel = new Label("selectedYearLabel", selectedYear);
 
         ListChoice<String> yearsList = new ListChoice<>("yearsList", new PropertyModel<String>(this, "selectedYear"), years);
         yearsList.setMaxRows(5);
@@ -114,12 +116,12 @@ public class GraduatersPage extends BasePage {
 
         CompleteCard selectedGraduaterCard = retrieveGraduaterCard(dataService, archiveGraduaters, pageParameters);
 
-        List<AttributeValue> attributesList = selectedGraduaterCard.getAttributes();
+        List<AttributeValue> attributesList = selectedGraduaterCard != null ? selectedGraduaterCard.getAttributes() : new ArrayList<>();
         Map<String, List<AttributeValue>> attributeMap = new HashMap(attributesList.stream().collect(Collectors.groupingBy(AttributeValue::getAttributeId)));
 
         retrieveAttributesValues(attributeMap);
 
-        List<ArchiveDocument> archiveDocuments = selectedGraduaterCard.getDocuments();
+        List<ArchiveDocument> archiveDocuments = selectedGraduaterCard != null ? selectedGraduaterCard.getDocuments() : new ArrayList<>();
         Collections.sort(archiveDocuments, (ArchiveObject ao1, ArchiveObject ao2) -> ao1.getName().compareTo(ao2.getName()));
 
         documentsNames = archiveDocuments.stream().map(searchResult -> searchResult.getName()).collect(Collectors.toList());
@@ -129,70 +131,26 @@ public class GraduatersPage extends BasePage {
         ListChoice<String> documentsNamesList = new ListChoice<>("documentsNamesList", new PropertyModel<String>(this, "selectedDocumentName"), documentsNames);
         documentsNamesList.setMaxRows(4);
 
-        final TextField<String> graduaterName = new TextField<String>("graduaterName", new PropertyModel<String>(this, "graduaterNameValue"));
-        final TextField<String> graduationWorkName = new TextField<String>("graduationWorkName", new PropertyModel<String>(this, "graduationWorkNameValue"));
-        final TextField<String> teacherName = new TextField<String>("teacherName", new PropertyModel<String>(this, "teacherNameValue"));
-        final TextField<String> altTeacherName = new TextField<String>("altTeacherName", new PropertyModel<String>(this, "altTeacherNameValue"));
-        final TextField<String> jobPlace = new TextField<String>("jobPlace", new PropertyModel<String>(this, "jobPlaceValue"));
-        final TextField<String> position = new TextField<String>("position", new PropertyModel<String>(this, "positionValue"));
-        final TextArea<String> shortReference = new TextArea<>("shortReference", new PropertyModel<String>(this, "shortReferenceValue"));
+        final TextField<String> graduaterName = new TextField<>("graduaterName", new PropertyModel<>(this, "graduaterNameValue"));
+        final TextField<String> graduationWorkName = new TextField<>("graduationWorkName", new PropertyModel<>(this, "graduationWorkNameValue"));
+        final TextField<String> teacherName = new TextField<>("teacherName", new PropertyModel<>(this, "teacherNameValue"));
+        final TextField<String> altTeacherName = new TextField<>("altTeacherName", new PropertyModel<>(this, "altTeacherNameValue"));
+        final TextField<String> jobPlace = new TextField<>("jobPlace", new PropertyModel<>(this, "jobPlaceValue"));
+        final TextField<String> position = new TextField<>("position", new PropertyModel<>(this, "positionValue"));
+        final TextArea<String> shortReference = new TextArea<>("shortReference", new PropertyModel<>(this, "shortReferenceValue"));
 
         Form<?> addNewYearForm = new Form<Void>("addNewYearForm") {
             @Override
             public void onSubmit() {
                 if (!years.contains(newYearValue)) {
-                    newYearCard = new Card(newYearValue);
+                    card = new Card(newYearValue);
                     if (educationLevel.equals("Бакалавриат")) {
-                        newYearCard.setParentObject(BACCALAUREATE_GRADUATERS_CARD_ID);
+                        card.setParentObject(BACCALAUREATE_GRADUATERS_CARD_ID);
                     } else {
-                        newYearCard.setParentObject(MAGISTRACY_GRADUATERS_CARD_ID);
+                        card.setParentObject(MAGISTRACY_GRADUATERS_CARD_ID);
                     }
-                    dataService.createCompleteCard(newYearCard, true, new ArrayList<AttributeValue>(), false);
-
-                    defaultNewGraduaterCard = new Card("Новый выпускник");
-                    defaultNewGraduaterCard.setParentObject(newYearCard.getObjectId());
-                    Map<String, List<AttributeValue>> attributeMap = new HashMap<>();
-
-                    attributeMap.put(GRADUATER_NAME_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue graduaterNameAttribute = new AttributeValue(GRADUATER_NAME_ATTR_ID, "*Введите ФИО выпускника");
-                    graduaterNameAttribute.setStringValue("*Введите ФИО выпускника");
-                    attributeMap.get(GRADUATER_NAME_ATTR_ID).add(graduaterNameAttribute);
-
-                    attributeMap.put(GRADUATION_WORK_NAME_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue graduationWorkNameAttribute = new AttributeValue(GRADUATION_WORK_NAME_ATTR_ID, "*Введите тему ВКР");
-                    graduationWorkNameAttribute.setStringValue("*Введите тему ВКР");
-                    attributeMap.get(GRADUATION_WORK_NAME_ATTR_ID).add(graduationWorkNameAttribute);
-
-                    attributeMap.put(TEACHER_NAME_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue teacherNameAttribute = new AttributeValue(TEACHER_NAME_ATTR_ID, "*Введите ФИО руководителя");
-                    teacherNameAttribute.setStringValue("*Введите ФИО руководителя");
-                    attributeMap.get(TEACHER_NAME_ATTR_ID).add(teacherNameAttribute);
-
-                    attributeMap.put(ALT_TEACHER_NAME_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue altTeacherNameAttribute = new AttributeValue(ALT_TEACHER_NAME_ATTR_ID, "*Введите ФИО альтернативного руководителя");
-                    altTeacherNameAttribute.setStringValue("*Введите ФИО альтернативного руководителя");
-                    attributeMap.get(ALT_TEACHER_NAME_ATTR_ID).add(altTeacherNameAttribute);
-
-                    attributeMap.put(JOB_PLACE_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue jobPlaceAttribute = new AttributeValue(JOB_PLACE_ATTR_ID, "*Введите место работы выпускника");
-                    jobPlaceAttribute.setStringValue("*Введите место работы выпускника");
-                    attributeMap.get(JOB_PLACE_ATTR_ID).add(jobPlaceAttribute);
-
-                    attributeMap.put(POSITION_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue positionAttribute = new AttributeValue(POSITION_ATTR_ID, "*Введите должность выпускника");
-                    positionAttribute.setStringValue("*Введите должность выпускника");
-                    attributeMap.get(POSITION_ATTR_ID).add(positionAttribute);
-
-                    attributeMap.put(SHORT_REFERENCE_ATTR_ID, new ArrayList<AttributeValue>());
-                    AttributeValue shortReferenceAttribute = new AttributeValue(SHORT_REFERENCE_ATTR_ID, "*Введите отзыв выпускника");
-                    shortReferenceAttribute.setStringValue("*Введите отзыв выпускника");
-                    attributeMap.get(SHORT_REFERENCE_ATTR_ID).add(shortReferenceAttribute);
-
-                    List<AttributeValue> attributesList = attributeMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
-                    dataService.createCompleteCard(defaultNewGraduaterCard, true, attributesList, false);
-
+                    dataService.createCompleteCard(card, true, new ArrayList<>(), false);
                     pageParameters.remove("selectedGraduaterName");
-                    pageParameters.add("selectedGraduaterName", "*Введите ФИО выпускника");
                     pageParameters.remove("selectedYear");
                     pageParameters.add("selectedYear", newYearValue);
                     archive3ServerConnector.logoff();
@@ -212,6 +170,17 @@ public class GraduatersPage extends BasePage {
             }
         };
 
+        Form<?> deleteYearForm = new Form<Void>("deleteYearForm") {
+            @Override
+            public void onSubmit() {
+                dataService.deleteObjects(archiveYears.get(selectedYear));
+                pageParameters.remove("selectedGraduaterName");
+                pageParameters.remove("selectedYear");
+                archive3ServerConnector.logoff();
+                setResponsePage(GraduatersPage.class, pageParameters);
+            }
+        };
+
         Form<?> graduatersNamesForm = new Form<Void>("graduatersNamesForm") {
             @Override
             public void onSubmit() {
@@ -219,6 +188,16 @@ public class GraduatersPage extends BasePage {
                 pageParameters.add("selectedGraduaterName", selectedGraduaterName);
                 archive3ServerConnector.logoff();
                 setResponsePage(GraduatersPage.class, pageParameters);
+            }
+        };
+
+        Form<?> addGraduaterForm = new Form<Void>("addGraduaterForm") {
+            @Override
+            public void onSubmit() {
+                pageParameters.remove("selectedGraduaterName");
+                pageParameters.add("parentID", archiveYears.get(selectedYear));
+                archive3ServerConnector.logoff();
+                setResponsePage(AddGraduaterPage.class, pageParameters);
             }
         };
 
@@ -238,9 +217,9 @@ public class GraduatersPage extends BasePage {
                 List<AttributeValue> updatedAttributesList = attributeMap.values().stream().flatMap(List::stream).collect(Collectors.toList());
                 attributeService.setAttributeValuesForAnObject(selectedGraduaterCard.getId(), updatedAttributesList);
 
-                archive3ServerConnector.logoff();
                 pageParameters.remove("selectedGraduaterName");
                 pageParameters.add("selectedGraduaterName", graduaterNameValue);
+                archive3ServerConnector.logoff();
                 setResponsePage(GraduatersPage.class, pageParameters);
             }
         };
@@ -304,21 +283,26 @@ public class GraduatersPage extends BasePage {
             @Override
             public void onSubmit() {
                 dataService.deleteObjects(selectedGraduaterCard.getId());
-                archive3ServerConnector.logoff();
                 pageParameters.remove("selectedGraduaterName");
+                archive3ServerConnector.logoff();
                 setResponsePage(GraduatersPage.class, pageParameters);
             }
         };
 
         add(addNewYearForm);
         addNewYearForm.add(educationLevelLabel);
+        addNewYearForm.add(selectedYearLabel);
         addNewYearForm.add(newYear);
 
         add(yearsForm);
         yearsForm.add(yearsList);
 
+        add(deleteYearForm);
+
         add(graduatersNamesForm);
         graduatersNamesForm.add(graduatersNamesList);
+
+        add(addGraduaterForm);
 
         add(selectedGraduaterInfoForm);
         selectedGraduaterInfoForm.add(graduaterName);
@@ -342,6 +326,9 @@ public class GraduatersPage extends BasePage {
 
         CompleteCard selectedGraduaterCard;
 
+        if (archiveGraduaters.isEmpty()) {
+            return null;
+        }
         if (selectedGraduaterName != null) {
             selectedGraduaterCard = dataService.getCompleteCard(archiveGraduaters.get(selectedGraduaterName));
         } else {
@@ -356,13 +343,13 @@ public class GraduatersPage extends BasePage {
 
     private void retrieveAttributesValues(Map<String, List<AttributeValue>> attributeMap) {
 
-        graduaterNameValue = attributeMap.get(GRADUATER_NAME_ATTR_ID).get(0).getValue();
-        graduationWorkNameValue = attributeMap.get(GRADUATION_WORK_NAME_ATTR_ID).get(0).getValue();
-        teacherNameValue = attributeMap.get(TEACHER_NAME_ATTR_ID).get(0).getStringValue();
-        altTeacherNameValue = attributeMap.get(ALT_TEACHER_NAME_ATTR_ID).get(0).getValue();
-        jobPlaceValue = attributeMap.get(JOB_PLACE_ATTR_ID).get(0).getValue();
-        positionValue = attributeMap.get(POSITION_ATTR_ID).get(0).getValue();
-        shortReferenceValue = attributeMap.get(SHORT_REFERENCE_ATTR_ID).get(0).getValue();
+        graduaterNameValue = attributeMap.get(GRADUATER_NAME_ATTR_ID) != null ? attributeMap.get(GRADUATER_NAME_ATTR_ID).get(0).getValue() : new String();
+        graduationWorkNameValue = attributeMap.get(GRADUATION_WORK_NAME_ATTR_ID) != null ? attributeMap.get(GRADUATION_WORK_NAME_ATTR_ID).get(0).getValue() : new String();
+        teacherNameValue = attributeMap.get(TEACHER_NAME_ATTR_ID) != null ? attributeMap.get(TEACHER_NAME_ATTR_ID).get(0).getStringValue() : new String();
+        altTeacherNameValue = attributeMap.get(ALT_TEACHER_NAME_ATTR_ID) != null ? attributeMap.get(ALT_TEACHER_NAME_ATTR_ID).get(0).getValue() : new String();
+        jobPlaceValue = attributeMap.get(JOB_PLACE_ATTR_ID) != null ? attributeMap.get(JOB_PLACE_ATTR_ID).get(0).getValue() : new String();
+        positionValue = attributeMap.get(POSITION_ATTR_ID) != null ? attributeMap.get(POSITION_ATTR_ID).get(0).getValue() : new String();
+        shortReferenceValue = attributeMap.get(SHORT_REFERENCE_ATTR_ID) != null ? attributeMap.get(SHORT_REFERENCE_ATTR_ID).get(0).getValue() : new String();
 
     }
 

@@ -19,36 +19,17 @@
                 <wicket:extend>
 
                     <div id="leftContent">
-                        <form wicket:id="addNewYearForm">
+                        <form wicket:id="titleForm">
                             <p style="font-size: 16px">
                                 <span wicket:id="educationLevelLabel" />
                                 <br/>
                                 <span wicket:id="selectedYearLabel" />
                             </p>
-                            <input wicket:id="newYear" type="text" placeholder="Введите год" style="width: 75px" />
-                            <input id="addButton" type="submit" value="Добавить год" />
-                        </form>
-                        <form wicket:id="yearsForm">
-                            <p><select wicket:id="yearsList" style="width: 320px" /></p>
-                            <input type="submit" value="Выбрать год" style="width: 320px" />
-                        </form>
-                        <br/>
-                        <form wicket:id="deleteYearForm">
-                            <input id="deleteButton" type="submit" value="Удалить год (сначала нужно выбрать)" style="width: 320px" />
-                        </form>
-                        <br/><br/><br/>
-                        <form wicket:id="graduatersNamesForm">
-                            <p><select wicket:id="graduatersNamesList" style="width: 320px" /></p>
-                            <input type="submit" value="Показать информацию" style="width: 320px" />
-                        </form>
-                        <br/>
-                        <form wicket:id="addGraduaterForm">
-                            <input id="addButton" type="submit" value="Добавить выпускника" style="width: 320px" />
                         </form>
                     </div>
 
                     <div id="rightContent">
-                        <form wicket:id="selectedGraduaterInfoForm">
+                        <form wicket:id="addGraduaterInfoForm">
                             <table>
                                 <tr>
                                     <td><label>ФИО</label></td>
@@ -77,33 +58,14 @@
                                     <td colspan="3"><textarea wicket:id="shortReference" rows="3" cols="92" style="resize: none" /></td>
                                 </tr>
                                 <tr>
-                                    <td colspan="4" style="text-align: right"><input type="submit" value="Обновить информацию" style="width: 200px" /></td>
+                                    <td colspan="4" style="text-align: right"><input type="submit" value="Добавить выпускника" style="width: 200px" /></td>
                                 </tr>
                             </table>
                         </form>
-                        <form wicket:id="documentsForm">
-                            <table>
-                                <tr style="vertical-align: top">
-                                    <td><label>Документы</label></td>
-                                    <td><select wicket:id="documentsNamesList" style="width: 200px" />
-                                        <br/>
-                                        <input id="deleteButton" type="submit" value="Удалить документ" style="width: 200px" />
-                                    </td>
-                                </tr>
-                            </table>
-                        </form>
-                        <form wicket:id="uploadDocument">
-                            <table>
-                                <tr>
-                                    <td><input wicket:id="fileUploadField" type="file" /></td>
-                                    <td><input id="addButton" type="submit" value="Загрузить документ" /></td>
-                                </tr>
-                            </table>
-                        </form>
-                        <form wicket:id="deleteGraduaterForm">
+                        <form wicket:id="cancelForm">
                             <table style="height: 100%">
                                 <tr>
-                                    <td style="width: 880px; text-align: right"><input id="deleteButton" type="submit" value="Удалить выпускника" style="width: 200px" /></td>
+                                    <td style="width: 880px; text-align: right"><input id="deleteButton" type="submit" value="Отмена" style="width: 200px" /></td>
                                 </tr>
                             </table>
                         </form>

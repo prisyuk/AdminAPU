@@ -20,7 +20,11 @@
 
                     <div id="leftContent">
                         <form wicket:id="addNewYearForm">
-                            <p style="font-size: 16px"><span wicket:id="educationLevelLabel" /></p>
+                            <p style="font-size: 16px">
+                                <span wicket:id="educationLevelLabel" />
+                                <br/>
+                                <span wicket:id="selectedYearLabel" />
+                            </p>
                             <input wicket:id="newYear" type="text" placeholder="Введите год" style="width: 75px" />
                             <input id="addButton" type="submit" value="Добавить год" />
                         </form>
@@ -28,10 +32,18 @@
                             <p><select wicket:id="yearsList" style="width: 320px" /></p>
                             <input type="submit" value="Выбрать год" style="width: 320px" />
                         </form>
+                        <br/>
+                        <form wicket:id="deleteYearForm">
+                            <input id="deleteButton" type="submit" value="Удалить год (сначала нужно выбрать)" style="width: 320px" />
+                        </form>
                         <br/><br/><br/>
                         <form wicket:id="graduatersNamesForm">
                             <p><select wicket:id="graduatersNamesList" style="width: 320px" /></p>
                             <input type="submit" value="Показать информацию" style="width: 320px" />
+                        </form>
+                        <br/>
+                        <form wicket:id="addGraduaterForm">
+                            <input id="addButton" type="submit" value="Добавить выпускника" style="width: 320px" />
                         </form>
                     </div>
 
